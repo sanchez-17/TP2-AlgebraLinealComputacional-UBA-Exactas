@@ -17,9 +17,9 @@ test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 #==============================================================================
 
 #-----------------------------------------------------------------------------
-#(a) Realizar una funcion en python que dado los datos de las imagenes de entrenamiento 
-#y una fila, grafique la imagen guardada en esa fila y en el tıtulo del grafico se 
-#indique a que numero corresponde, es decir su clasificacion. Usar la funcion imshow() de pyplot.
+# (a) Realizar una funcion en python que dado los datos de las imagenes de entrenamiento 
+# y una fila, grafique la imagen guardada en esa fila y en el tıtulo del grafico se 
+# indique a que numero corresponde, es decir su clasificacion. Usar la funcion imshow() de pyplot.
 #-----------------------------------------------------------------------------
 
 def graficar(df,fila):
@@ -34,8 +34,8 @@ df = train
 #graficar(df,fila)
 
 #-----------------------------------------------------------------------------
-#(b) ¿Cuantas imagenes hay por cada dıgito en el conjunto de entrenamiento? ¿Y en el conjunto
-#de testeo?
+# (b) ¿Cuantas imagenes hay por cada dıgito en el conjunto de entrenamiento? ¿Y en el conjunto
+# de testeo?
 #-----------------------------------------------------------------------------
 
 cantidad_de_imagenes_por_numero_train = train[0].value_counts().sort_index()
@@ -69,8 +69,8 @@ cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
 #9    1009
 
 #-----------------------------------------------------------------------------
-#(c) Para las primeras 2.000 imagenes del conjunto de entrenamiento realizar una funcion en python
-#que devuelva la imagen promedio de cada uno de los dıgitos.
+# (c) Para las primeras 2.000 imagenes del conjunto de entrenamiento realizar una funcion en python
+# que devuelva la imagen promedio de cada uno de los dıgitos.
 #-----------------------------------------------------------------------------
 
 imagenes = []   #guardaremos las imagenes en un array para luego graficarlas
@@ -87,7 +87,7 @@ for n in range(0,10):
 
 
 #-----------------------------------------------------------------------------
-#(d) Graficar cada una de las imagenes promedio obtenidas.
+# (d) Graficar cada una de las imagenes promedio obtenidas.
 #-----------------------------------------------------------------------------
 
 def graficar_imagenes():
@@ -101,9 +101,9 @@ def graficar_imagenes():
 #==============================================================================
 
 #-----------------------------------------------------------------------------
-#(a) Realizar una funcion en python que dadas las imagenes promedio del ejercicio 2(c), calcule la
-#menor distancia Euclıdea entre todos los dıgitos y cada una de las primeras 200 imagenes de
-#testeo. La funcion debe devolver un arreglo con las 200 predicciones.
+# (a) Realizar una funcion en python que dadas las imagenes promedio del ejercicio 2(c), calcule la
+# menor distancia Euclıdea entre todos los dıgitos y cada una de las primeras 200 imagenes de
+# testeo. La funcion debe devolver un arreglo con las 200 predicciones.
 #-----------------------------------------------------------------------------
 
 # la funcion ditancia() toma dos imagenes (np.array de tamaño 784) y calcula distancia euclidea en R^784
@@ -141,10 +141,10 @@ def prediccion_200(df,imagenes):
 
 
 #-----------------------------------------------------------------------------
-#(b) Realizar una funcion en python que tome el arreglo de predicciones anteriores y evalue si es
-#correcta o no la prediccion. Debe devolver la precision en la prediccion. Se define la precision
-#como:
-# precision = Σ(Casos acierto) / Σ(Casos totales)
+# (b) Realizar una funcion en python que tome el arreglo de predicciones anteriores y evalue si es
+# correcta o no la prediccion. Debe devolver la precision en la prediccion. Se define la precision
+# como:
+#  precision = Σ(Casos acierto) / Σ(Casos totales)
 #-----------------------------------------------------------------------------
 
 def precision(df,imagenes):
@@ -159,8 +159,8 @@ def precision(df,imagenes):
 
 
 #-----------------------------------------------------------------------------
-#(c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
-#buena la precision?
+# (c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
+# buena la precision?
 #-----------------------------------------------------------------------------
 
 def imagenes_no_acertadas(df,imagenes):
@@ -171,11 +171,74 @@ def imagenes_no_acertadas(df,imagenes):
     indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
     return indices_imagenes_no_acertadas
 
-#generamos numero random para graficar alguna de las imagenes no acertadas
-def graficar_num_no_acertado():
-    numeros_no_acertados = imagenes_no_acertadas(test,imagenes)
-    r = np.random.randint(0,len(numeros_no_acertados))
-    graficar(test,numeros_no_acertados[r]) 
-    print('Numero: ',test.iloc[numeros_no_acertados[r],0])
-    print('Indice: ',numeros_no_acertados[r])
 
+def graficar_num_no_acertado():
+    indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes)
+    #generamos numero random para graficar alguna de las imagenes no acertadas
+    r = np.random.randint(0,len(indices_imagenes_no_acertadas))
+    graficar(test,indices_imagenes_no_acertadas[r]) 
+    print('Numero: ',test.iloc[indices_imagenes_no_acertadas[r],0])
+    print('Indice: ',indices_imagenes_no_acertadas[r])
+
+
+#==============================================================================
+# EJERCICIO 3
+#==============================================================================
+
+# Implemetar una funcion en Python que dada una matriz A halle la descomposicion SVD de A, por
+# el metodo de la potencia.
+# Llamamos descomposicion SVD en valores singulares a:
+# A = U ΣV T Implemetar una funcion en Python que dada una matriz A halle la descomposicion SVD de A, por
+# el metodo de la potencia.
+
+def svd(A):
+
+
+
+#==============================================================================
+# EJERCICIO 4
+#==============================================================================
+
+# Se utilizara la descomposicion SVD para resolver la clasificacion de imagenes correspondiente a
+# numeros manuscritos.
+
+#-----------------------------------------------------------------------------
+# (a) Tomar las primeras 2.000 imagenes del conjunto de imagenes de testeo y ordenarlas segun el
+# dıgito al que corresponde de 0 a 9. Obtener 10 matrices correspondientes a cada dıgito. Estas
+# matrices deben tener una dimension de 785 × cantidad imagenes, puede no haber la misma
+# cantidad de imagenes para cada dıgito en las primeras 2.000 imagenes. Recordar que la primer
+# columna es la clasificacion. Finalmente obtener Mi=0,...,9 matrices de 784 × cantidad imagenes
+# quitando la primer columna. Se pueden guardar las matrices en un arreglo de tipo lista donde
+# cada ıtem de la lista se corresponde con una matriz Mi y la posicion hace referencia al dıgito
+# que representan.
+#-----------------------------------------------------------------------------
+
+test_2000 = test.iloc[:2000,:]
+
+lista_matrices = []
+for n in range(0,10):
+    #obtengo matrices para cada numero
+    matriz_n = test_2000[test_2000[0] == n].iloc[:,1:]  # se le saca la primer columna
+    lista_matrices.append(matriz_n)
+
+
+#-----------------------------------------------------------------------------
+# (b) Realizar la descomposicion SVD de cada una de las matrices Mi utilizando la funcion creada
+# en el ejercicio (3). Para ello realizar una funcion en Python que tome la lista de matrices Mi
+# y devuelva en 3 listas la solucion de la descomposicion, es decir Ui, Σi y Vi.
+#-----------------------------------------------------------------------------
+
+
+
+#-----------------------------------------------------------------------------
+# (c) Las columnas de Ui son combinacion lineal del espacio columna de Mi. Teniendo esto presente
+# tomar la primer columna de cada Ui y graficarla como imagen, es decir convertir a una matriz
+# de 28 × 28 y graficar. Explique que representa.
+#-----------------------------------------------------------------------------
+
+
+
+#-----------------------------------------------------------------------------
+# (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
+# obtenido en (c) y explicar las diferencias.
+#-----------------------------------------------------------------------------
