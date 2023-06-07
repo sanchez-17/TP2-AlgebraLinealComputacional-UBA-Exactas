@@ -28,7 +28,7 @@ def graficar(df,fila):
     plt.title(numero)
     plt.show()
 
-#prueba
+#prueba:
 fila = 1
 df = train
 #graficar(df,fila)
@@ -106,11 +106,17 @@ def graficar_imagenes():
 #testeo. La funcion debe devolver un arreglo con las 200 predicciones.
 #-----------------------------------------------------------------------------
 
+# la funcion ditancia() toma dos imagenes (np.array de tamaño 784) y calcula distancia euclidea en R^784
+
 def distancia(imagen1,imagen2):
     distancia=0
     for i in range(0,784):
         distancia+=np.sqrt((imagen1[i]-imagen2[i])**2)
     return distancia
+
+# la funcion prediccion() toma la lista de promedios de las imagenes del 0 al 9, y una imagen a testear 
+# la array a testear debe tener en la posicion [0] el numero de la imagen: tamaño de 785
+# devolvera un float
 
 def prediccion(imagenes,imagen_test):
     prediccion=imagen_0
@@ -118,32 +124,41 @@ def prediccion(imagenes,imagen_test):
         # se le saca el primer elemento al array (que indica el numero de la imagen)
         if distancia(imagen[1:],imagen_test[1:]) <= distancia(prediccion[1:],imagen_test[1:]):
             prediccion=imagen
-    return prediccion
+    return prediccion[0]
 
+# la funcion prediccion_200() toma un df (test) y la lista de promedios de las imagenes
+# devolvera una lista de 200 predicciones, de las primeras 200 imagenes del dataframe
 
-def prediccion_200(df=test,imagenes=imagenes):
+def prediccion_200(df,imagenes):
     df = df.iloc[:200,:]
     predicciones=[]
     for i in range(0,200):
         prediccion = imagen_0
         imagen_i = np.array(df.iloc[i,:])
         prediccion = prediccion(imagenes,imagen_i)
-        predicciones.append(prediccion[0])
+        predicciones.append(prediccion)
     return predicciones
 
 
 
-        
-
-
 #-----------------------------------------------------------------------------
-#(b) Realizar una funcion en python que tome el arreglo de predicciones anteriores y eval ́ue si es
-#correcta o no la predicci ́on. Debe devolver la precisi ́on en la predicci ́on. Se define la precisi ́on
+#(b) Realizar una funcion en python que tome el arreglo de predicciones anteriores y evalue si es
+#correcta o no la prediccion. Debe devolver la precision en la prediccion. Se define la precision
 #como:
-#P recisi ́on = Σ(Casos acierto)
-#Σ(Casos totales)
+# precision = Σ(Casos acierto) / Σ(Casos totales)
 #-----------------------------------------------------------------------------
 
+def precision(df,imagenes):
+    df = df.iloc[:200,:]
+    predicciones = np.array(prediccion_200(df,imagenes))    # array de las 200 predicciones
+    valores_posta = np.array(df.iloc[:,0])  # array de los valores reales de cada imagen
+    # (predicciones == valores_posta) es un array de booleanos, contamos los valores 'True', 
+    # es decir las coincidencias entre los array
+    aciertos = pd.DataFrame(predicciones == valores_posta).value_counts()[True]     
+    return aciertos/200
+
+    
+    
 
 
 #-----------------------------------------------------------------------------
