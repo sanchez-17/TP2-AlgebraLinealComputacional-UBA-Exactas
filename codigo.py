@@ -191,7 +191,7 @@ def graficar_num_no_acertado():
 # A = U ΣV T Implemetar una funcion en Python que dada una matriz A halle la descomposicion SVD de A, por
 # el metodo de la potencia.
 
-def svd(A):
+#def svd(A):
 
 
 
