@@ -81,9 +81,9 @@ imagenes = []   #guardaremos las imagenes en un array para luego graficarlas
 for n in range(0,10):
     df = train[train[0] == n].iloc[:2000,:]    #creamos df unicamente con las imagenes del numero n
     imagenes_n = df.to_numpy()    #convertimos el df en un array bidimensional de numpy
-    imagen_promedio = np.mean(imagenes_n,axis=0)  # .mean() calcula el promedio de todas las imagenes
+    imagen_promedio = np.mean(imagenes_n,axis=0)  # .mean() calcula el promedio de todas las imagenes que se encuentran como filas de la matriz 'imagenes_n'
     imagenes.append(imagen_promedio)
-    globals()['imagen_'+str(n)] = imagen_promedio
+    globals()['imagen_'+str(n)] = imagen_promedio   # asignamos la imagen promedio de cada numero 'n' a una variable llamada 'imagen_n' 
 
 
 #-----------------------------------------------------------------------------
@@ -133,10 +133,9 @@ def prediccion_200(df,imagenes):
     df = df.iloc[:200,:]
     predicciones=[]
     for i in range(0,200):
-        prediccion = imagen_0
-        imagen_i = np.array(df.iloc[i,:])
-        prediccion = prediccion(imagenes,imagen_i)
-        predicciones.append(prediccion)
+        imagen_i = np.array(df.iloc[i,:])   # se recorren las imagenes 
+        prediccion_i = prediccion(imagenes,imagen_i)  # se realiza la prediccion de la imagen actual
+        predicciones.append(prediccion_i)
     return predicciones
 
 
@@ -156,15 +155,27 @@ def precision(df,imagenes):
     # es decir las coincidencias entre los array
     aciertos = pd.DataFrame(predicciones == valores_posta).value_counts()[True]     
     return aciertos/200
-
-    
-    
+   
 
 
 #-----------------------------------------------------------------------------
-#(c) Graficar un par de casos de im ́agenes de testeo en los cuales no se haya acertado. ¿Considera
-#buena la precisi ́on?
+#(c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
+#buena la precision?
 #-----------------------------------------------------------------------------
 
+def imagenes_no_acertadas(df,imagenes):
+    df = df.iloc[:200,:]
+    predicciones = np.array(prediccion_200(df,imagenes))    # array de las 200 predicciones
+    valores_posta = np.array(df.iloc[:,0])  # array de los valores reales de cada imagen
+    no_acertadas = pd.DataFrame(predicciones == valores_posta)     
+    indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
+    return indices_imagenes_no_acertadas
 
+#generamos numero random para graficar alguna de las imagenes no acertadas
+def graficar_num_no_acertado():
+    numeros_no_acertados = imagenes_no_acertadas(test,imagenes)
+    r = np.random.randint(0,len(numeros_no_acertados))
+    graficar(test,numeros_no_acertados[r]) 
+    print('Numero: ',test.iloc[numeros_no_acertados[r],0])
+    print('Indice: ',numeros_no_acertados[r])
 
