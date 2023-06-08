@@ -242,7 +242,7 @@ def svd(A):
         B = np.dot(np.transpose(A),A)
 
         # obtenemos cada u_i, v_i, y s_i(valor singular) aplicando la formula dada en el trabajo
-        v_i = metodo_potencia(B,x0,0.0000001)
+        v_i = metodo_potencia(B,x0,0.1)
         s_i = np.linalg.norm(np.dot(A,v_i))
         u_i = np.dot(A,v_i) / s_i
 
@@ -297,6 +297,17 @@ for n in range(0,10):
 # y devuelva en 3 listas la solucion de la descomposicion, es decir Ui, Σi y Vi.
 #-----------------------------------------------------------------------------
 
+def svd_Mi(lista_matrices):
+    Ui = []
+    Si = []
+    Vi = []
+    for matriz in lista_matrices:
+        u_i,s_i,v_i = svd(np.array(matriz))     # cada matriz en la lista es un DF, lo pasamos a np.array
+        Ui.append(u_i)
+        Si.append(s_i)
+        Vi.append(v_i)
+    return Ui,Si,Vi
+
 
 
 #-----------------------------------------------------------------------------
@@ -305,7 +316,11 @@ for n in range(0,10):
 # de 28 × 28 y graficar. Explique que representa.
 #-----------------------------------------------------------------------------
 
+# la funcion graficara la primer columna de cada Ui para la SVD de las 10 matrices
 
+def graficar_u1(Ui):
+    for ui in Ui:
+        plt.imshow(np.array(df.iloc[fila,1:]).reshape((28,28)),cmap='gray')
 
 #-----------------------------------------------------------------------------
 # (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
