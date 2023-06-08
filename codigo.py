@@ -201,13 +201,21 @@ def graficar_num_no_acertado():
 # el metodo de la potencia.
 
 def metodo_potencia(A,x0,e):
-    x_i = x0
-    error = 1
-    while error > (1-e):
+    x_i = x0 / np.linalg.norm(x0)
+    error = 0.000001
+    #iteraciones=0
+    while error < (1-e):
         x_j = x_i
         x_i = np.dot(A,x_i)
         x_i = x_i / np.linalg.norm(x_i)
         error = np.dot(x_i,x_j)
+        #iteraciones+=1
+
+    # printeos para testear que hace
+    #print('x_i: ',x_i)
+    #print('x_j: ',x_j)
+    #print('Error: ',error)
+    #print('Iteraciones: ',iteraciones)
     return x_i
 
 def minima_dim(A):
@@ -226,14 +234,15 @@ def svd(A):
 
     # Sea MxN la dimension de A, nececito el minimo entre M y N para saber la cantidad
     # de iteraciones, ya que ese minimo me determina ya sea la cantidad de columnas de U o de V
-    # que puedo hallar. 
+    # que puedo hallar con esta funcion iterativa
     m = minima_dim(A)
     
     for i in range(1,m+1):
         # generamos B = At*A
         B = np.dot(np.transpose(A),A)
 
-        v_i = metodo_potencia(B,x0,0.001)
+        # obtenemos cada u_i, v_i, y s_i(valor singular) aplicando la formula dada en el trabajo
+        v_i = metodo_potencia(B,x0,0.0000001)
         s_i = np.linalg.norm(np.dot(A,v_i))
         u_i = np.dot(A,v_i) / s_i
 
@@ -241,22 +250,18 @@ def svd(A):
         s = np.zeros(m)
         s[i-1] = s_i
          
-        U.append(u_i)
+        U.append(u_i)   # agrego los u_i como filas, cuando termine de iterar transpongo y obtengo U con u_i como columnas
         S.append(s)
-        V.append(v_i)
+        V.append(v_i)   # agrego v_i como filas, osea que la V que devuelve la funcion ya es V transpuesta
 
         # actualizamos A restandole s * u_i * v_i
+        # se hace un reshape de los vectores para poder hacer la multiplicacion de un vector Mx1 * 1xN, y que devuelva una matriz MxN
         A = A - np.dot((s_i*u_i).reshape(len(u_i),1),v_i.reshape(1,len(v_i)))
     
     U = np.transpose(U)
 
-    return U,S,V
+    return U,np.array(S),np.array(V)
         
-
-
-
-
-    
 
 
 #==============================================================================
