@@ -25,10 +25,10 @@ test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 def graficar(df,fila):
     plt.imshow(np.array(df.iloc[fila,1:]).reshape((28,28)),cmap='gray')
     numero = str(df.iloc[fila,0])
-    plt.title(numero)
+    plt.title('Numero: ',numero)
     plt.show()
 
-#prueba:
+#prueNumero: ',test.iloc[indices_imagenes_no_acertadas[r],0]ba:
 fila = 1
 df = train
 #graficar(df,fila)
@@ -124,7 +124,7 @@ def prediccion(imagenes,imagen_test):
         # se le saca el primer elemento al array (que indica el numero de la imagen)
         if distancia(imagen[1:],imagen_test[1:]) <= distancia(prediccion[1:],imagen_test[1:]):
             prediccion=imagen
-    return prediccion[0]
+    return int(prediccion[0])
 
 # la funcion prediccion_200() toma un df (test) y la lista de promedios de las imagenes
 # devolvera una lista de 200 predicciones, de las primeras 200 imagenes del dataframe
@@ -176,9 +176,18 @@ def graficar_num_no_acertado():
     indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes)
     #generamos numero random para graficar alguna de las imagenes no acertadas
     r = np.random.randint(0,len(indices_imagenes_no_acertadas))
+
+    # printeos extras
+    numero = test.iloc[indices_imagenes_no_acertadas[r],0]
+    indice = indices_imagenes_no_acertadas[r]
+    predic = prediccion(imagenes,np.array(test.iloc[indices_imagenes_no_acertadas[r],:]))
+    print('Numero: ',numero)
+    print('Indice: ',indice)
+    print('Prediccion: ',predic)
+    print('Distancia al ',numero,' (valor real): ',distancia(imagenes[numero][1:],np.array(test.iloc[indice,1:])))
+    print('Distancia al ',predic,' (prediccion): ',distancia(imagenes[predic][1:],np.array(test.iloc[indice,1:])))
+
     graficar(test,indices_imagenes_no_acertadas[r]) 
-    print('Numero: ',test.iloc[indices_imagenes_no_acertadas[r],0])
-    print('Indice: ',indices_imagenes_no_acertadas[r])
 
 
 #==============================================================================
@@ -191,8 +200,63 @@ def graficar_num_no_acertado():
 # A = U ΣV T Implemetar una funcion en Python que dada una matriz A halle la descomposicion SVD de A, por
 # el metodo de la potencia.
 
-#def svd(A):
+def metodo_potencia(A,x0,e):
+    x_i = x0
+    error = 1
+    while error > (1-e):
+        x_j = x_i
+        x_i = np.dot(A,x_i)
+        x_i = x_i / np.linalg.norm(x_i)
+        error = np.dot(x_i,x_j)
+    return x_i
 
+def minima_dim(A):
+    return min(len(A[0]),len(A))
+
+def svd(A):
+    
+    # sea NxN la dimension de B, generamos vector x0 de dimension N
+    x0 = np.random.random(len(A[0]))
+    x0 = x0 / np.linalg.norm(x0)    #normalizamos x0
+
+    # declaramos las matrices de la descomposicion:
+    U = []
+    S = []
+    V = []
+
+    # Sea MxN la dimension de A, nececito el minimo entre M y N para saber la cantidad
+    # de iteraciones, ya que ese minimo me determina ya sea la cantidad de columnas de U o de V
+    # que puedo hallar. 
+    m = minima_dim(A)
+    
+    for i in range(1,m+1):
+        # generamos B = At*A
+        B = np.dot(np.transpose(A),A)
+
+        v_i = metodo_potencia(B,x0,0.001)
+        s_i = np.linalg.norm(np.dot(A,v_i))
+        u_i = np.dot(A,v_i) / s_i
+
+        # armamos el vector de m ceros con el valor singular actual en posicion i-1
+        s = np.zeros(m)
+        s[i-1] = s_i
+         
+        U.append(u_i)
+        S.append(s)
+        V.append(v_i)
+
+        # actualizamos A restandole s * u_i * v_i
+        A = A - np.dot((s_i*u_i).reshape(len(u_i),1),v_i.reshape(1,len(v_i)))
+    
+    U = np.transpose(U)
+
+    return U,S,V
+        
+
+
+
+
+    
 
 
 #==============================================================================
