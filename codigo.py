@@ -216,7 +216,29 @@ def imagenes_no_acertadas(df,imagenes):
     indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
     return indices_imagenes_no_acertadas
 
+def imgs_no_acertadas(df_test,imagenes_p):
+    df_test = df_test.iloc[:200,:]
+    predicciones = prediccion_200_Aux(df_test,imagenes_p)
+    y_test = df_test.iloc[:200,0].values
+    indices = predicciones != y_test
+    res = df_test.iloc[indices,:] 
+    res = res.reset_index(drop=True) #reseteo los indices, pues ya no son continuos
+    return res
 
+
+#%%
+
+def graficar_alguna_img_yeta():
+    imgs = imgs_no_acertadas(test,imagenes_prom)
+    cant_imgs = len(imgs)
+    i = np.random.randint(0, cant_imgs)
+    
+    img_no_acert =imgs.iloc[i,1:]
+    pred = prediccion(imagenes_prom,img_no_acert)
+    
+    graficar(imgs,i)
+    print("prediccion: ",pred)
+    
 def graficar_num_no_acertado():
     indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes_prom)
     #generamos numero random para graficar alguna de las imagenes no acertadas
@@ -234,6 +256,8 @@ def graficar_num_no_acertado():
 
     graficar(test,indices_imagenes_no_acertadas[r]) 
 
+graficar_alguna_img_yeta()
+#%%
 
 #==============================================================================
 # EJERCICIO 3
