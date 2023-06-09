@@ -88,7 +88,7 @@ print(df_combined)
 # que devuelva la imagen promedio de cada uno de los dıgitos.
 #-----------------------------------------------------------------------------
 
-imagenes = []   #guardaremos las imagenes en un array para luego graficarlas
+imagenes_prom = []   #guardaremos las imagenes en un array para luego graficarlas
 
 # aclaracion: las imagenes promedio guardaran el numero que representan en la posicion [0],
 # para graficarlas habra que omitir el primer elemento del array
@@ -97,7 +97,7 @@ for n in range(0,10):
     df_n = train[train[0] == n].iloc[:2000,:]    #creamos df unicamente con las imagenes del numero n
     imagenes_n = df_n.to_numpy()    #convertimos el df en un array bidimensional de numpy
     imagen_promedio = np.mean(imagenes_n,axis=0)  # .mean() calcula el promedio de todas las imagenes que se encuentran como filas de la matriz 'imagenes_n'
-    imagenes.append(imagen_promedio)
+    imagenes_prom.append(imagen_promedio)
     globals()['imagen_'+str(n)] = imagen_promedio   # asignamos la imagen promedio de cada numero 'n' a una variable llamada 'imagen_n' 
 
 #%%
@@ -106,7 +106,7 @@ for n in range(0,10):
 #-----------------------------------------------------------------------------
 
 def graficar_imagenes():
-    for imagen in imagenes:
+    for imagen in imagenes_prom:
         plt.imshow(imagen[1:].reshape(28,28),cmap='gray')
         plt.show()
 
@@ -135,15 +135,33 @@ def distancia(imagen1,imagen2):
 # devolvera un float
 
 def prediccion(imagenes,imagen_test):
-    prediccion=imagen_0
-    for imagen in imagenes:
+    prediccion=imagenes[0] #imagen_0, a mi me tira error por ser variable global
+    for imagen in imagenes_prom:
         # se le saca el primer elemento al array (que indica el numero de la imagen)
         if distancia(imagen[1:],imagen_test[1:]) <= distancia(prediccion[1:],imagen_test[1:]):
             prediccion=imagen
     return int(prediccion[0])
 
+def prediccion_aux(imagenes,imagen_test):
+    prediccion=imagenes[0]
+    for imagen in imagenes_prom:
+        # se le saca el primer elemento al array (que indica el numero de la imagen)
+        if distancia(imagen[1:],imagen_test) <= distancia(prediccion[1:],imagen_test):
+            prediccion=imagen
+    return int(prediccion[0])
+    
+
 # la funcion prediccion_200() toma un df (test) y la lista de promedios de las imagenes
 # devolvera una lista de 200 predicciones, de las primeras 200 imagenes del dataframe
+
+def prediccion_200_Aux(df_test,imagenes_p):
+    df = df_test.iloc[:200,test.columns[1:]].values
+    predicciones = []
+    for i in range(200):
+        imgTest_i = df[i]
+        pred_i = prediccion_aux(imagenes_p,imgTest_i)
+        predicciones.append(pred_i)
+    return predicciones
 
 def prediccion_200(df,imagenes):
     df = df.iloc[:200,:]
@@ -173,7 +191,13 @@ def precision(df,imagenes):
     return aciertos/200
    
 
+def precision_aux(df_test, imagenes_p):
+    predicciones = prediccion_200_Aux(df_test,imagenes_p)
+    y_test = df_test.iloc[:200,0].values #.values para pasar a array numpy
+    aciertos = sum(predicciones == y_test)
+    return aciertos/200
 
+print("Precision: ", precision_aux(test,imagenes_prom))
 #-----------------------------------------------------------------------------
 # (c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
 # buena la precision?
