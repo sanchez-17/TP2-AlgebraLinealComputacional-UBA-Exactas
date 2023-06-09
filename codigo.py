@@ -30,8 +30,8 @@ def graficar(df,fila):
 
 #prueNumero: ',test.iloc[indices_imagenes_no_acertadas[r],0]ba:
     
-fila = np.random.randint(0, len(train)) #Elegimos una imagen al azar
-graficar(train,fila)
+#fila = np.random.randint(0, len(train)) #Elegimos una imagen al azar
+#graficar(train,fila)
 
 #%%
 #-----------------------------------------------------------------------------
@@ -40,9 +40,12 @@ graficar(train,fila)
 #-----------------------------------------------------------------------------
 
 cantidad_de_imagenes_por_numero_train = train[0].value_counts().sort_index()
-print("=========================\nConjunto de entrenamiento\n=========================")
-print("Las cantidades por digito son: ")
-print(cantidad_de_imagenes_por_numero_train)
+
+#print("=========================\nConjunto de entrenamiento\n=========================")
+#print("Las cantidades por digito son: ")
+#print(cantidad_de_imagenes_por_numero_train)
+#print()
+
 # las cantidades son:
 
 #0    5923
@@ -57,9 +60,12 @@ print(cantidad_de_imagenes_por_numero_train)
 #9    5949
 
 cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
-print("=========================\nConjunto de testeo\n=========================")
-print("Las cantidades por digito son: ")
-print(cantidad_de_imagenes_por_numero_test)
+
+#print("=========================\nConjunto de testeo\n=========================")
+#print("Las cantidades por digito son: ")
+#print(cantidad_de_imagenes_por_numero_test)
+#print()
+
 # las cantidades son:
 
 #0     980
@@ -72,15 +78,18 @@ print(cantidad_de_imagenes_por_numero_test)
 #7    1027
 #8     974
 #9    1009
+
 #%% 
+
 # Muestro resultados en una sola tabla para una mejor comparacion
-df_train = pd.DataFrame({'Conjunto de entrenamiento': cantidad_de_imagenes_por_numero_train})
-df_test = pd.DataFrame({'Conjunto de testeo': cantidad_de_imagenes_por_numero_test})
-df_combined = pd.concat([df_train, df_test], axis=1)
-df_combined.index.name = 'Dígito'
-print("====================================\nConjunto de entrenamiento y testeo\n====================================")
-print("Las cantidades por dígito son: \n")
-print(df_combined)
+#df_train = pd.DataFrame({'Conjunto de entrenamiento': cantidad_de_imagenes_por_numero_train})
+#df_test = pd.DataFrame({'Conjunto de testeo': cantidad_de_imagenes_por_numero_test})
+#df_combined = pd.concat([df_train, df_test], axis=1)
+#df_combined.index.name = 'Dígito'
+#print("====================================\nConjunto de entrenamiento y testeo\n====================================")
+#print("Las cantidades por dígito son: \n")
+#print(df_combined)
+#print()
 
 #%%
 #-----------------------------------------------------------------------------
@@ -110,7 +119,7 @@ def graficar_imagenes():
         plt.imshow(imagen[1:].reshape(28,28),cmap='gray')
         plt.show()
 
-graficar_imagenes()
+#graficar_imagenes()
 #%%
 #==============================================================================
 # EJERCICIO 2
@@ -122,7 +131,7 @@ graficar_imagenes()
 # testeo. La funcion debe devolver un arreglo con las 200 predicciones.
 #-----------------------------------------------------------------------------
 
-# la funcion ditancia() toma dos imagenes (np.array de tamaño 784) y calcula distancia euclidea en R^784
+# la funcion distancia() toma dos imagenes (np.array de tamaño 784) y calcula distancia euclidea en R^784
 """
 def distancia(imagen1,imagen2):
     distancia=0
@@ -201,7 +210,7 @@ def precision_aux(df_test, imagenes_p):
     aciertos = sum(predicciones == y_test)
     return aciertos/200
 
-print("Precision: ", precision_aux(test,imagenes_prom))
+#print("Precision: ", precision_aux(test,imagenes_prom))
 #%%
 #-----------------------------------------------------------------------------
 # (c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
@@ -259,7 +268,7 @@ def graficar_num_no_acertado():
 
     graficar(test,indices_imagenes_no_acertadas[r]) 
 
-graficar_alguna_img_yeta()
+#graficar_alguna_img_yeta()
 #%%
 
 #==============================================================================
@@ -360,7 +369,7 @@ lista_matrices = []
 for n in range(0,10):
     #obtengo matrices para cada numero
     matriz_n = test_2000[test_2000[0] == n].iloc[:,1:]  # se le saca la primer columna
-    lista_matrices.append(matriz_n)
+    lista_matrices.append(np.transpose(np.array(matriz_n)))
 
 
 #-----------------------------------------------------------------------------
@@ -374,12 +383,11 @@ def svd_Mi(lista_matrices):
     Si = []
     Vi = []
     for matriz in lista_matrices:
-        u_i,s_i,v_i = svd(np.array(matriz))     # cada matriz en la lista es un DF, lo pasamos a np.array
+        u_i,s_i,v_i = svd(matriz)     # cada matriz en la lista es un DF, lo pasamos a np.array
         Ui.append(u_i)
         Si.append(s_i)
         Vi.append(v_i)
     return Ui,Si,Vi
-
 
 
 #-----------------------------------------------------------------------------
@@ -391,10 +399,44 @@ def svd_Mi(lista_matrices):
 # la funcion graficara la primer columna de cada Ui para la SVD de las 10 matrices
 
 def graficar_u1(Ui):
+    Ui,Si,Vi = svd_Mi(lista_matrices)
     for ui in Ui:
-        plt.imshow(np.array(df.iloc[fila,1:]).reshape((28,28)),cmap='gray')
+        plt.imshow(np.transpose(ui)[0].reshape((28,28)),cmap='gray')
+        plt.title('Grafico con columna u1 del ',i)
+        plt.show()
 
 #-----------------------------------------------------------------------------
 # (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
 # obtenido en (c) y explicar las diferencias.
 #-----------------------------------------------------------------------------
+
+def graficar_u2_u3(Ui):
+    Ui,Si,Vi = svd_Mi(lista_matrices)
+    for ui in Ui:
+        plt.subplot(1,2,1)
+        plt.imshow(np.transpose(ui)[1].reshape((28,28)),cmap='gray')
+        plt.title('Grafico con columna u2 del ',i)
+        plt.subplot(1,2,2)
+        plt.imshow(np.transpose(ui)[2].reshape((28,28)),cmap='gray')
+        plt.title('Grafico con columna u3 del ',i)
+        plt.show()
+
+
+#-----------------------------------------------------------------------------
+
+def comparar_promedio_svd(lista_matrices,imagenes_prom):
+    Ui,Si,Vi = svd_Mi(lista_matrices)
+    for i in range(0,10):
+        imagen_promedio = imagenes_prom[i][1:].reshape((28,28))
+        imagen_u1 = np.transpose(Ui[i])[0].reshape((28,28))
+        plt.subplot(1,2,1)
+        plt.imshow(imagen_promedio,cmap='gray')
+        plt.title('imagen promedio')
+        plt.subplot(1,2,2)
+        plt.imshow(imagen_u1,cmap='gray')
+        plt.title('imagen u1')
+        plt.show()
+
+
+#-----------------------------------------------------------------------------
+
