@@ -40,7 +40,9 @@ graficar(train,fila)
 #-----------------------------------------------------------------------------
 
 cantidad_de_imagenes_por_numero_train = train[0].value_counts().sort_index()
-
+print("=========================\nConjunto de entrenamiento\n=========================")
+print("Las cantidades por digito son: ")
+print(cantidad_de_imagenes_por_numero_train)
 # las cantidades son:
 
 #0    5923
@@ -55,7 +57,9 @@ cantidad_de_imagenes_por_numero_train = train[0].value_counts().sort_index()
 #9    5949
 
 cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
-
+print("=========================\nConjunto de entrenamiento\n=========================")
+print("Las cantidades por digito son: ")
+print(cantidad_de_imagenes_por_numero_test)
 # las cantidades son:
 
 #0     980
@@ -68,7 +72,7 @@ cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
 #7    1027
 #8     974
 #9    1009
-
+#%%
 #-----------------------------------------------------------------------------
 # (c) Para las primeras 2.000 imagenes del conjunto de entrenamiento realizar una funcion en python
 # que devuelva la imagen promedio de cada uno de los dıgitos.
