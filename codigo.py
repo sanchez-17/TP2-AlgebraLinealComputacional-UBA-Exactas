@@ -123,12 +123,16 @@ graficar_imagenes()
 #-----------------------------------------------------------------------------
 
 # la funcion ditancia() toma dos imagenes (np.array de tamaño 784) y calcula distancia euclidea en R^784
-
+"""
 def distancia(imagen1,imagen2):
     distancia=0
     for i in range(0,784):
         distancia+=np.sqrt((imagen1[i]-imagen2[i])**2)
     return distancia
+"""
+
+def distancia(img1,img2):
+    return np.linalg.norm(img1-img2)
 
 # la funcion prediccion() toma la lista de promedios de las imagenes del 0 al 9, y una imagen a testear 
 # la array a testear debe tener en la posicion [0] el numero de la imagen: tamaño de 785
@@ -198,6 +202,7 @@ def precision_aux(df_test, imagenes_p):
     return aciertos/200
 
 print("Precision: ", precision_aux(test,imagenes_prom))
+#%%
 #-----------------------------------------------------------------------------
 # (c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
 # buena la precision?
@@ -213,19 +218,19 @@ def imagenes_no_acertadas(df,imagenes):
 
 
 def graficar_num_no_acertado():
-    indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes)
+    indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes_prom)
     #generamos numero random para graficar alguna de las imagenes no acertadas
     r = np.random.randint(0,len(indices_imagenes_no_acertadas))
 
     # printeos extras
     numero = test.iloc[indices_imagenes_no_acertadas[r],0]
     indice = indices_imagenes_no_acertadas[r]
-    predic = prediccion(imagenes,np.array(test.iloc[indices_imagenes_no_acertadas[r],:]))
+    predic = prediccion(imagenes_prom,np.array(test.iloc[indices_imagenes_no_acertadas[r],:]))
     print('Numero: ',numero)
     print('Indice: ',indice)
     print('Prediccion: ',predic)
-    print('Distancia al ',numero,' (valor real): ',distancia(imagenes[numero][1:],np.array(test.iloc[indice,1:])))
-    print('Distancia al ',predic,' (prediccion): ',distancia(imagenes[predic][1:],np.array(test.iloc[indice,1:])))
+    print('Distancia al ',numero,' (valor real): ',distancia(imagenes_prom[numero][1:],np.array(test.iloc[indice,1:])))
+    print('Distancia al ',predic,' (prediccion): ',distancia(imagenes_prom[predic][1:],np.array(test.iloc[indice,1:])))
 
     graficar(test,indices_imagenes_no_acertadas[r]) 
 
