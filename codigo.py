@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 train = pd.read_csv('mnist_train.csv',names=np.linspace(0,784,785))
 test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 
-
+#%%
 #==============================================================================
 # EJERCICIO 1
 #==============================================================================
@@ -23,16 +23,17 @@ test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 #-----------------------------------------------------------------------------
 
 def graficar(df,fila):
-    plt.imshow(np.array(df.iloc[fila,1:]).reshape((28,28)),cmap='gray')
-    numero = str(df.iloc[fila,0])
-    plt.title('Numero: ',numero)
+    plt.imshow(np.array(df.iloc[fila,1:]).reshape(28,28),cmap='gray')
+    numero = df.iloc[fila,0]
+    plt.title(f'Numero: {numero}')
     plt.show()
 
 #prueNumero: ',test.iloc[indices_imagenes_no_acertadas[r],0]ba:
-fila = 1
-df = train
-#graficar(df,fila)
+    
+fila = np.random.randint(0, len(train)) #Elegimos una imagen al azar
+graficar(train,fila)
 
+#%%
 #-----------------------------------------------------------------------------
 # (b) ¿Cuantas imagenes hay por cada dıgito en el conjunto de entrenamiento? ¿Y en el conjunto
 # de testeo?
