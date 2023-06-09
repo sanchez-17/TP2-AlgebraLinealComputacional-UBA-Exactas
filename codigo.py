@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 train = pd.read_csv('mnist_train.csv',names=np.linspace(0,784,785))
 test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 
-
+#%%
 #==============================================================================
 # EJERCICIO 1
 #==============================================================================
@@ -23,23 +23,26 @@ test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 #-----------------------------------------------------------------------------
 
 def graficar(df,fila):
-    plt.imshow(np.array(df.iloc[fila,1:]).reshape((28,28)),cmap='gray')
-    numero = str(df.iloc[fila,0])
-    plt.title('Numero: ',numero)
+    plt.imshow(np.array(df.iloc[fila,1:]).reshape(28,28),cmap='gray')
+    numero = df.iloc[fila,0]
+    plt.title(f'Numero: {numero}')
     plt.show()
 
 #prueNumero: ',test.iloc[indices_imagenes_no_acertadas[r],0]ba:
-fila = 1
-df = train
-#graficar(df,fila)
+    
+fila = np.random.randint(0, len(train)) #Elegimos una imagen al azar
+graficar(train,fila)
 
+#%%
 #-----------------------------------------------------------------------------
 # (b) ¿Cuantas imagenes hay por cada dıgito en el conjunto de entrenamiento? ¿Y en el conjunto
 # de testeo?
 #-----------------------------------------------------------------------------
 
 cantidad_de_imagenes_por_numero_train = train[0].value_counts().sort_index()
-
+print("=========================\nConjunto de entrenamiento\n=========================")
+print("Las cantidades por digito son: ")
+print(cantidad_de_imagenes_por_numero_train)
 # las cantidades son:
 
 #0    5923
@@ -54,7 +57,9 @@ cantidad_de_imagenes_por_numero_train = train[0].value_counts().sort_index()
 #9    5949
 
 cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
-
+print("=========================\nConjunto de testeo\n=========================")
+print("Las cantidades por digito son: ")
+print(cantidad_de_imagenes_por_numero_test)
 # las cantidades son:
 
 #0     980
@@ -67,35 +72,46 @@ cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
 #7    1027
 #8     974
 #9    1009
+#%% 
+# Muestro resultados en una sola tabla para una mejor comparacion
+df_train = pd.DataFrame({'Conjunto de entrenamiento': cantidad_de_imagenes_por_numero_train})
+df_test = pd.DataFrame({'Conjunto de testeo': cantidad_de_imagenes_por_numero_test})
+df_combined = pd.concat([df_train, df_test], axis=1)
+df_combined.index.name = 'Dígito'
+print("====================================\nConjunto de entrenamiento y testeo\n====================================")
+print("Las cantidades por dígito son: \n")
+print(df_combined)
 
+#%%
 #-----------------------------------------------------------------------------
 # (c) Para las primeras 2.000 imagenes del conjunto de entrenamiento realizar una funcion en python
 # que devuelva la imagen promedio de cada uno de los dıgitos.
 #-----------------------------------------------------------------------------
 
-imagenes = []   #guardaremos las imagenes en un array para luego graficarlas
+imagenes_prom = []   #guardaremos las imagenes en un array para luego graficarlas
 
 # aclaracion: las imagenes promedio guardaran el numero que representan en la posicion [0],
 # para graficarlas habra que omitir el primer elemento del array
 
 for n in range(0,10):
-    df = train[train[0] == n].iloc[:2000,:]    #creamos df unicamente con las imagenes del numero n
-    imagenes_n = df.to_numpy()    #convertimos el df en un array bidimensional de numpy
+    df_n = train[train[0] == n].iloc[:2000,:]    #creamos df unicamente con las imagenes del numero n
+    imagenes_n = df_n.to_numpy()    #convertimos el df en un array bidimensional de numpy
     imagen_promedio = np.mean(imagenes_n,axis=0)  # .mean() calcula el promedio de todas las imagenes que se encuentran como filas de la matriz 'imagenes_n'
-    imagenes.append(imagen_promedio)
+    imagenes_prom.append(imagen_promedio)
     globals()['imagen_'+str(n)] = imagen_promedio   # asignamos la imagen promedio de cada numero 'n' a una variable llamada 'imagen_n' 
 
-
+#%%
 #-----------------------------------------------------------------------------
 # (d) Graficar cada una de las imagenes promedio obtenidas.
 #-----------------------------------------------------------------------------
 
 def graficar_imagenes():
-    for imagen in imagenes:
-        plt.imshow(imagen[1:].reshape((28,28)),cmap='gray')
+    for imagen in imagenes_prom:
+        plt.imshow(imagen[1:].reshape(28,28),cmap='gray')
         plt.show()
 
-
+graficar_imagenes()
+#%%
 #==============================================================================
 # EJERCICIO 2
 #==============================================================================
@@ -107,27 +123,49 @@ def graficar_imagenes():
 #-----------------------------------------------------------------------------
 
 # la funcion ditancia() toma dos imagenes (np.array de tamaño 784) y calcula distancia euclidea en R^784
-
+"""
 def distancia(imagen1,imagen2):
     distancia=0
     for i in range(0,784):
         distancia+=np.sqrt((imagen1[i]-imagen2[i])**2)
     return distancia
+"""
+
+def distancia(img1,img2):
+    return np.linalg.norm(img1-img2)
 
 # la funcion prediccion() toma la lista de promedios de las imagenes del 0 al 9, y una imagen a testear 
 # la array a testear debe tener en la posicion [0] el numero de la imagen: tamaño de 785
 # devolvera un float
 
 def prediccion(imagenes,imagen_test):
-    prediccion=imagen_0
-    for imagen in imagenes:
+    prediccion=imagenes[0] #imagen_0, a mi me tira error por ser variable global
+    for imagen in imagenes_prom:
         # se le saca el primer elemento al array (que indica el numero de la imagen)
         if distancia(imagen[1:],imagen_test[1:]) <= distancia(prediccion[1:],imagen_test[1:]):
             prediccion=imagen
     return int(prediccion[0])
 
+def prediccion_aux(imagenes,imagen_test):
+    prediccion=imagenes[0]
+    for imagen in imagenes_prom:
+        # se le saca el primer elemento al array (que indica el numero de la imagen)
+        if distancia(imagen[1:],imagen_test) <= distancia(prediccion[1:],imagen_test):
+            prediccion=imagen
+    return int(prediccion[0])
+    
+
 # la funcion prediccion_200() toma un df (test) y la lista de promedios de las imagenes
 # devolvera una lista de 200 predicciones, de las primeras 200 imagenes del dataframe
+
+def prediccion_200_Aux(df_test,imagenes_p):
+    df = df_test.iloc[:200,test.columns[1:]].values
+    predicciones = []
+    for i in range(200):
+        imgTest_i = df[i]
+        pred_i = prediccion_aux(imagenes_p,imgTest_i)
+        predicciones.append(pred_i)
+    return predicciones
 
 def prediccion_200(df,imagenes):
     df = df.iloc[:200,:]
@@ -157,7 +195,14 @@ def precision(df,imagenes):
     return aciertos/200
    
 
+def precision_aux(df_test, imagenes_p):
+    predicciones = prediccion_200_Aux(df_test,imagenes_p)
+    y_test = df_test.iloc[:200,0].values #.values para pasar a array numpy
+    aciertos = sum(predicciones == y_test)
+    return aciertos/200
 
+print("Precision: ", precision_aux(test,imagenes_prom))
+#%%
 #-----------------------------------------------------------------------------
 # (c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
 # buena la precision?
@@ -171,24 +216,48 @@ def imagenes_no_acertadas(df,imagenes):
     indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
     return indices_imagenes_no_acertadas
 
+def imgs_no_acertadas(df_test,imagenes_p):
+    df_test = df_test.iloc[:200,:]
+    predicciones = prediccion_200_Aux(df_test,imagenes_p)
+    y_test = df_test.iloc[:200,0].values
+    indices = predicciones != y_test
+    res = df_test.iloc[indices,:] 
+    res = res.reset_index(drop=True) #reseteo los indices, pues ya no son continuos
+    return res
 
+
+#%%
+
+def graficar_alguna_img_yeta():
+    imgs = imgs_no_acertadas(test,imagenes_prom)
+    cant_imgs = len(imgs)
+    i = np.random.randint(0, cant_imgs)
+    
+    img_no_acert =imgs.iloc[i,1:]
+    pred = prediccion(imagenes_prom,img_no_acert)
+    
+    graficar(imgs,i)
+    print("prediccion: ",pred)
+    
 def graficar_num_no_acertado():
-    indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes)
+    indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes_prom)
     #generamos numero random para graficar alguna de las imagenes no acertadas
     r = np.random.randint(0,len(indices_imagenes_no_acertadas))
 
     # printeos extras
     numero = test.iloc[indices_imagenes_no_acertadas[r],0]
     indice = indices_imagenes_no_acertadas[r]
-    predic = prediccion(imagenes,np.array(test.iloc[indices_imagenes_no_acertadas[r],:]))
+    predic = prediccion(imagenes_prom,np.array(test.iloc[indices_imagenes_no_acertadas[r],:]))
     print('Numero: ',numero)
     print('Indice: ',indice)
     print('Prediccion: ',predic)
-    print('Distancia al ',numero,' (valor real): ',distancia(imagenes[numero][1:],np.array(test.iloc[indice,1:])))
-    print('Distancia al ',predic,' (prediccion): ',distancia(imagenes[predic][1:],np.array(test.iloc[indice,1:])))
+    print('Distancia al ',numero,' (valor real): ',distancia(imagenes_prom[numero][1:],np.array(test.iloc[indice,1:])))
+    print('Distancia al ',predic,' (prediccion): ',distancia(imagenes_prom[predic][1:],np.array(test.iloc[indice,1:])))
 
     graficar(test,indices_imagenes_no_acertadas[r]) 
 
+graficar_alguna_img_yeta()
+#%%
 
 #==============================================================================
 # EJERCICIO 3
