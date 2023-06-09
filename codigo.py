@@ -57,7 +57,7 @@ print(cantidad_de_imagenes_por_numero_train)
 #9    5949
 
 cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
-print("=========================\nConjunto de entrenamiento\n=========================")
+print("=========================\nConjunto de testeo\n=========================")
 print("Las cantidades por digito son: ")
 print(cantidad_de_imagenes_por_numero_test)
 # las cantidades son:
@@ -72,6 +72,16 @@ print(cantidad_de_imagenes_por_numero_test)
 #7    1027
 #8     974
 #9    1009
+#%% 
+# Muestro resultados en una sola tabla para una mejor comparacion
+df_train = pd.DataFrame({'Conjunto de entrenamiento': cantidad_de_imagenes_por_numero_train})
+df_test = pd.DataFrame({'Conjunto de testeo': cantidad_de_imagenes_por_numero_test})
+df_combined = pd.concat([df_train, df_test], axis=1)
+df_combined.index.name = 'Dígito'
+print("====================================\nConjunto de entrenamiento y testeo\n====================================")
+print("Las cantidades por dígito son: \n")
+print(df_combined)
+
 #%%
 #-----------------------------------------------------------------------------
 # (c) Para las primeras 2.000 imagenes del conjunto de entrenamiento realizar una funcion en python
