@@ -208,14 +208,9 @@ print("Precision: ", precision_aux(test,imagenes_prom))
 # buena la precision?
 #-----------------------------------------------------------------------------
 
-def imagenes_no_acertadas(df,imagenes):
-    df = df.iloc[:200,:]
-    predicciones = np.array(prediccion_200(df,imagenes))    # array de las 200 predicciones
-    valores_posta = np.array(df.iloc[:,0])  # array de los valores reales de cada imagen
-    no_acertadas = pd.DataFrame(predicciones == valores_posta)     
-    indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
-    return indices_imagenes_no_acertadas
 
+#=============================================================
+#Gaston
 def imgs_no_acertadas(df_test,imagenes_p):
     df_test = df_test.iloc[:200,:]
     predicciones = prediccion_200_Aux(df_test,imagenes_p)
@@ -224,9 +219,6 @@ def imgs_no_acertadas(df_test,imagenes_p):
     res = df_test.iloc[indices,:] 
     res = res.reset_index(drop=True) #reseteo los indices, pues ya no son continuos
     return res
-
-
-#%%
 
 def graficar_alguna_img_yeta():
     imgs = imgs_no_acertadas(test,imagenes_prom)
@@ -238,7 +230,18 @@ def graficar_alguna_img_yeta():
     
     graficar(imgs,i)
     print("prediccion: ",pred)
-    
+
+#=============================================================
+
+def imagenes_no_acertadas(df,imagenes):
+    df = df.iloc[:200,:]
+    predicciones = np.array(prediccion_200(df,imagenes))    # array de las 200 predicciones
+    valores_posta = np.array(df.iloc[:,0])  # array de los valores reales de cada imagen
+    no_acertadas = pd.DataFrame(predicciones == valores_posta)     
+    indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
+    return indices_imagenes_no_acertadas
+
+
 def graficar_num_no_acertado():
     indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes_prom)
     #generamos numero random para graficar alguna de las imagenes no acertadas
