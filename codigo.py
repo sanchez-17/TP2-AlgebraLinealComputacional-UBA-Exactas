@@ -103,11 +103,13 @@ imagenes_prom = []   #guardaremos las imagenes en un array para luego graficarla
 # para graficarlas habra que omitir el primer elemento del array
 
 for n in range(0,10):
-    df_n = train[train[0] == n].iloc[:2000,:]    #creamos df unicamente con las imagenes del numero n
-    imagenes_n = df_n.to_numpy()    #convertimos el df en un array bidimensional de numpy
-    imagen_promedio = np.mean(imagenes_n,axis=0)  # .mean() calcula el promedio de todas las imagenes que se encuentran como filas de la matriz 'imagenes_n'
+    imagen_promedio = np.array(train[train[0]==n].iloc[:2000,:].mean())
     imagenes_prom.append(imagen_promedio)
     globals()['imagen_'+str(n)] = imagen_promedio   # asignamos la imagen promedio de cada numero 'n' a una variable llamada 'imagen_n' 
+
+#    df_n = train[train[0] == n].iloc[:2000,:]    #creamos df unicamente con las imagenes del numero n
+#    imagenes_n = df_n.to_numpy()    #convertimos el df en un array bidimensional de numpy
+#    imagen_promedio = np.mean(imagenes_n,axis=0)  # .mean() calcula el promedio de todas las imagenes que se encuentran como filas de la matriz 'imagenes_n'
 
 #%%
 #-----------------------------------------------------------------------------
