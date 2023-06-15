@@ -325,7 +325,7 @@ def svd(A):
         B = np.dot(np.transpose(A),A)
 
         # obtenemos cada u_i, v_i, y s_i(valor singular) aplicando la formula dada en el trabajo
-        v_i = metodo_potencia(B,x0,0.1)
+        v_i = metodo_potencia(B,x0,0.00000000000000001)
         s_i = np.linalg.norm(np.dot(A,v_i))
         u_i = np.dot(A,v_i) / s_i
 
@@ -400,28 +400,32 @@ def svd_Mi(lista_matrices):
 
 # la funcion graficara la primer columna de cada Ui para la SVD de las 10 matrices
 
-def graficar_u1(Ui):
+def graficar_u1(lista_matrices):
     Ui,Si,Vi = svd_Mi(lista_matrices)
+    i=0
     for ui in Ui:
         plt.imshow(np.transpose(ui)[0].reshape((28,28)),cmap='gray')
-        plt.title('Grafico con columna u1 del ',i)
+        plt.title('Grafico con columna u1 del '+str(i))
         plt.show()
+        i+=1
 
 #-----------------------------------------------------------------------------
 # (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
 # obtenido en (c) y explicar las diferencias.
 #-----------------------------------------------------------------------------
 
-def graficar_u2_u3(Ui):
+def graficar_u2_u3(lista_matrices):
     Ui,Si,Vi = svd_Mi(lista_matrices)
+    i=0
     for ui in Ui:
         plt.subplot(1,2,1)
         plt.imshow(np.transpose(ui)[1].reshape((28,28)),cmap='gray')
-        plt.title('Grafico con columna u2 del ',i)
+        plt.title('Grafico con columna u2 del '+str(i))
         plt.subplot(1,2,2)
         plt.imshow(np.transpose(ui)[2].reshape((28,28)),cmap='gray')
-        plt.title('Grafico con columna u3 del ',i)
+        plt.title('Grafico con columna u3 del '+str(i))
         plt.show()
+        i+=1
 
 
 #-----------------------------------------------------------------------------
@@ -441,4 +445,48 @@ def comparar_promedio_svd(lista_matrices,imagenes_prom):
 
 
 #-----------------------------------------------------------------------------
+# (e)
+#• Sea ˆUi,k ∈ R784×k la matriz que resulta de tomar las primeras k columnas de Ui (hacerlo
+#para k de 1 a 5).
+#• Obtener la matriz ˆUi,k ˆU t
+#i,k, es decir, la matriz que proyecta ortogonalmente sobre la imagen
+#de ˆUi,k.
+#• Obtener el residuo como: ri,k(x) = x − ˆUi,k ˆU t
+#i,kx, donde x es la imagen (vectorizada) de la
+#cual se quiere conocer la m´ınima distancia al subespacio generado por la imagen de ˆUi,k.
+#• Guardar el ˆi cuyo residuo es el menor, es decir, ˆi = min{i : ∥ri,k(x)∥}, para i = 0, . . . , 9.
+#´Esta es la predicci´on para la imagen x, en la aproximaci´on de rango k.
+#• Comparar con el d´ıgito esperado.
+#-----------------------------------------------------------------------------
+
+# toma la lista de Ui, luego calcula el i cuyo residuo es menor
+# k es la cantidad de columnas a utilizar de cada Ui
+# x es la imagen a predecir su digito
+def predecir(Ui,k,x):
+    menor_residuo = 0
+    digito_menor_residuo = 0 
+    for i in range(9):
+        Uik = Ui[i][:,:k-1]
+        residuo_i = np.linalg.norm(x-(np.dot(Uik,np.dot(np.transpose(Uik),x))))
+        if i == 0:
+            menor_residuo = residuo_i
+        if residuo_i < menor_residuo:
+            menor_residuo = residuo_i
+            digito_menor_residuo = i
+    return digito_menor_residuo
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
 
