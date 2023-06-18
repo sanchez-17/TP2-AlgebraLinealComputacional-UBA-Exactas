@@ -269,8 +269,8 @@ graficar_alguna_img_yeta()
 # Implemetar una funcion en Python que dada una matriz A halle la descomposicion SVD de A, por
 # el metodo de la potencia.
 # Llamamos descomposicion SVD en valores singulares a:
-# A = U ΣV T Implemetar una funcion en Python que dada una matriz A halle la descomposicion SVD de A, por
-# el metodo de la potencia.
+# A = U ΣV T 
+
 
 def metodo_potencia(A,x0,e):
     x_i = x0 / np.linalg.norm(x0)
