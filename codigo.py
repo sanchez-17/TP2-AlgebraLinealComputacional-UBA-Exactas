@@ -21,14 +21,36 @@ test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 # y una fila, grafique la imagen guardada en esa fila y en el tıtulo del grafico se 
 # indique a que numero corresponde, es decir su clasificacion. Usar la funcion imshow() de pyplot.
 #-----------------------------------------------------------------------------
+def configuraciones_diseño():
+    """
+    Seteo de configuraciones de los bordes de un plot
+    """
+    #Bordes negros de grosor=2
+    plt.box(on=True)
+    ax = plt.gca()
+    ax.spines['top'].set_color('black')
+    ax.spines['bottom'].set_color('black')
+    ax.spines['left'].set_color('black')
+    ax.spines['right'].set_color('black')
+    ax.spines['top'].set_linewidth(2)
+    ax.spines['bottom'].set_linewidth(2)
+    ax.spines['left'].set_linewidth(2)
+    ax.spines['right'].set_linewidth(2)
+    #Ocultar numero de pixeles en eje X e Y
+    plt.gca().set_xticks([])
+    plt.gca().set_yticks([])
 
 def graficar(df,fila,pred = None):
-    plt.imshow(np.array(df.iloc[fila,1:]).reshape(28,28),cmap='gray')
+    """
+    Grafica una imagen de un df por indice dado por fila, pred es del tipo string. Indica la prediccion en el grafico.
+    """
+    plt.imshow(np.array(df.iloc[fila,1:]).reshape(28,28),cmap='Greys')
     numero = df.iloc[fila,0]
     plt.title(f'Numero: {numero}')
     if pred :
-        plt.figtext(0.5, 0.01, f'prediccion: {pred}', ha='center', fontsize=10)
-    plt.axis('off')
+        plt.figtext(0.5, 0.01, f'prediccion: {pred}', ha='center', fontsize=14)
+    #plt.axis('off')
+    configuraciones_diseño()
     plt.show()
 
 #prueNumero: ',test.iloc[indices_imagenes_no_acertadas[r],0]ba:
@@ -81,7 +103,36 @@ cantidad_de_imagenes_por_numero_test = test[0].value_counts().sort_index()
 #7    1027
 #8     974
 #9    1009
+#%%
+#%% Exploracion de datos
+# vemos la distribucion de los digitos en el dataset
+def distribuciones(df,nombre_df):
+    # Calcular las ocurrencias de cada dígito
+    ocurrencias = df[df.columns[0]].value_counts()
+    # Calcular el total de ocurrencias
+    total_ocurrencias = ocurrencias.sum()
+    # Calcular los porcentajes de ocurrencia
+    porcentajes = (ocurrencias / total_ocurrencias) * 100
+    # Crear la figura y el eje del gráfico
+    fig, ax = plt.subplots()
+    digitos = [str(d) for d in ocurrencias.index]
+    plt.bar(digitos,ocurrencias.values)
+    #Agregar etiquetas de texto en cada barra
+    for i in range(len(ocurrencias)):
+        ax.text(i , ocurrencias.values[i],
+                f"{porcentajes.values[i]:.2f}%",
+                ha='center',
+                va='top',
+                rotation=60,
+                c="azure")
+    # Configurar etiquetas y título del gráfico
+    ax.set_xlabel('Dígitos')
+    ax.set_ylabel('Ocurrencias')
+    ax.set_title('Dataset: '+nombre_df)
+    plt.show()
 
+#distribuciones(train,"train")
+#distribuciones(test,"test")
 #%% 
 
 # Muestro resultados en una sola tabla para una mejor comparacion
@@ -119,10 +170,15 @@ for n in range(0,10):
 # (d) Graficar cada una de las imagenes promedio obtenidas.
 #-----------------------------------------------------------------------------
 
+      
 def graficar_imagenes():
     for imagen in imagenes_prom:
-        plt.imshow(imagen[1:].reshape(28,28),cmap='gray')
+        plt.title(f'Numero: {int(imagen[0])}')
+        plt.imshow(imagen[1:].reshape(28,28),cmap='Greys')
+        #plt.axis('off')
+        configuraciones_diseño()
         plt.show()
+        
 
 #graficar_imagenes()
 #%%
@@ -141,7 +197,7 @@ def graficar_imagenes():
 def distancia(imagen1,imagen2):
     distancia=0
     for i in range(0,784):
-        distancia+=np.sqrt((imagen1[i]-imagen2[i])**2)
+        distancia+=np.sqrt((imagen1[i]-imagen2[i])**2) #Aca creo que tomas raiz cuadrada en cada sumando, y solo tenes que aplicar al final
     return distancia
 """
 
@@ -152,7 +208,7 @@ def distancia(img1,img2):
 # la array a testear debe tener en la posicion [0] el numero de la imagen: tamaño de 785
 # devolvera un float
 
-def prediccion(imagenes,imagen_test):
+def prediccion_Juani(imagenes,imagen_test):
     prediccion=imagenes[0] #imagen_0, a mi me tira error por ser variable global
     for imagen in imagenes_prom:
         # se le saca el primer elemento al array (que indica el numero de la imagen)
@@ -160,19 +216,28 @@ def prediccion(imagenes,imagen_test):
             prediccion=imagen
     return int(prediccion[0])
 
-def prediccion_aux(imagenes,imagen_test):
+def prediccion_Gaston(imagenes,imagen_test):
     prediccion=imagenes[0]
     for imagen in imagenes_prom:
         # se le saca el primer elemento al array (que indica el numero de la imagen)
         if distancia(imagen[1:],imagen_test) <= distancia(prediccion[1:],imagen_test):
             prediccion=imagen
     return int(prediccion[0])
-    
+
+#Puse esta  en el jupyter: Las 3 andan bien
+def prediccion(imagenes_prom,imagen_test):
+    distancias = []
+    #Calculamos todas las distancias y tomamos la minima
+    for imagen in imagenes_prom:
+        dist = distancia(imagen[1:],imagen_test)
+        distancias.append(dist)
+    pred = np.argmin(distancias)
+    return pred
 
 # la funcion prediccion_200() toma un df (test) y la lista de promedios de las imagenes
 # devolvera una lista de 200 predicciones, de las primeras 200 imagenes del dataframe
 
-def prediccion_200_Aux(df_test,imagenes_p):
+def prediccion_200_Gaston(df_test,imagenes_p):
     df = df_test.iloc[:200,test.columns[1:]].values
     predicciones = []
     for i in range(200):
@@ -181,7 +246,7 @@ def prediccion_200_Aux(df_test,imagenes_p):
         predicciones.append(pred_i)
     return predicciones
 
-def prediccion_200(df,imagenes):
+def prediccion_200_Juani(df,imagenes):
     df = df.iloc[:200,:]
     predicciones=[]
     for i in range(0,200):
@@ -190,7 +255,14 @@ def prediccion_200(df,imagenes):
         predicciones.append(prediccion_i)
     return predicciones
 
-
+#Puse esta  en el jupyter: Las 2 andan bien
+def prediccion_200(df_test,imagenes_prom):
+    df = df_test.iloc[:200,df_test.columns[1:]].values
+    predicciones = []
+    for i in range(len(df)):
+        pred_i = prediccion(imagenes_prom,df[i])
+        predicciones.append(pred_i)
+    return predicciones
 
 #-----------------------------------------------------------------------------
 # (b) Realizar una funcion en python que tome el arreglo de predicciones anteriores y evalue si es
@@ -199,7 +271,7 @@ def prediccion_200(df,imagenes):
 #  precision = Σ(Casos acierto) / Σ(Casos totales)
 #-----------------------------------------------------------------------------
 
-def precision(df,imagenes):
+def precision_Juani(df,imagenes):
     df = df.iloc[:200,:]
     predicciones = np.array(prediccion_200(df,imagenes))    # array de las 200 predicciones
     valores_posta = np.array(df.iloc[:,0])  # array de los valores reales de cada imagen
@@ -209,13 +281,21 @@ def precision(df,imagenes):
     return aciertos/200
    
 
-def precision_aux(df_test, imagenes_p):
+def precision_Gaston(df_test, imagenes_p):
     predicciones = prediccion_200_Aux(df_test,imagenes_p)
     y_test = df_test.iloc[:200,0].values #.values para pasar a array numpy
     aciertos = sum(predicciones == y_test)
     return aciertos/200
 
-#print("Precision: ", precision_aux(test,imagenes_prom))
+#Puse esta  en el jupyter: Las 2 andan bien
+def precision(df_test, imagenes_p):
+    predicciones = prediccion_200(df_test,imagenes_p)
+    y_test = df_test.iloc[:200,0].values #.values para pasar a array numpy
+    aciertos = sum(predicciones == y_test)
+    return aciertos/200
+
+#print("Precision: ", precision(test,imagenes_prom))
+
 #%%
 #-----------------------------------------------------------------------------
 # (c) Graficar un par de casos de imagenes de testeo en los cuales no se haya acertado. ¿Considera
@@ -224,7 +304,7 @@ def precision_aux(df_test, imagenes_p):
 
 
 #=============================================================
-#Gaston
+""" Descarte las mias, lo tuyo muestra mas info
 def imgs_no_acertadas(df_test,imagenes_p):
     df_test = df_test.iloc[:200,:]
     predicciones = prediccion_200_Aux(df_test,imagenes_p)
@@ -244,7 +324,7 @@ def graficar_alguna_img_sin_acertar():
     
     graficar(imgs,i)
     print("prediccion: ",pred)
-
+"""
 #=============================================================
 
 def imagenes_no_acertadas(df,imagenes):
@@ -255,7 +335,6 @@ def imagenes_no_acertadas(df,imagenes):
     indices_imagenes_no_acertadas = no_acertadas[no_acertadas[0] == False].index
     return indices_imagenes_no_acertadas
 
-
 def graficar_num_no_acertado():
     indices_imagenes_no_acertadas = imagenes_no_acertadas(test,imagenes_prom)
     #generamos numero random para graficar alguna de las imagenes no acertadas
@@ -264,16 +343,15 @@ def graficar_num_no_acertado():
     # printeos extras
     numero = test.iloc[indices_imagenes_no_acertadas[r],0]
     indice = indices_imagenes_no_acertadas[r]
-    predic = prediccion(imagenes_prom,np.array(test.iloc[indices_imagenes_no_acertadas[r],:]))
+    predic = prediccion(imagenes_prom,np.array(test.iloc[indices_imagenes_no_acertadas[r],1:]))
     print('Numero: ',numero)
     print('Indice: ',indice)
-    print('Prediccion: ',predic)
     print('Distancia al ',numero,' (valor real): ',distancia(imagenes_prom[numero][1:],np.array(test.iloc[indice,1:])))
     print('Distancia al ',predic,' (prediccion): ',distancia(imagenes_prom[predic][1:],np.array(test.iloc[indice,1:])))
 
-    graficar(test,indices_imagenes_no_acertadas[r]) 
+    graficar(test,indices_imagenes_no_acertadas[r],predic) 
 
-#graficar_alguna_img_sin_acertar()
+#graficar_num_no_acertado()
 #%%
 
 #==============================================================================
@@ -284,9 +362,21 @@ def graficar_num_no_acertado():
 # el metodo de la potencia.
 # Llamamos descomposicion SVD en valores singulares a:
 # A = U ΣV T 
-
-
-def metodo_potencia(A,x0,e):
+"""
+def metodo_potencia(B,x0,e): #Puse esta en el jupyter
+    x_i = x0
+    x_j=B@x0
+    x_j = x_j / np.linalg.norm(x_j)
+    
+    error = np.dot(x_i,x_j)
+    while error < (1-e):
+        x_i = x_j
+        x_j = B@x_j
+        x_j = x_j / np.linalg.norm(x_j)
+        error = np.dot(x_i,x_j)
+    return x_j
+"""
+def metodo_potencia(A,x0,e):#No se porque este algunas veces se cuelga cuando ejecuto svd(A)
     x_i = x0 / np.linalg.norm(x0)
     error = 0.000001
     #iteraciones=0
@@ -372,12 +462,12 @@ def svd(A):
 
 train_2000 = train.iloc[:2000,:]
 
-lista_matrices = []
+matrices_M_i = []
 
 for n in range(0,10):
     #obtengo matrices para cada numero
     matriz_n = train_2000[train_2000[0] == n].iloc[:,1:]  # se le saca la primer columna
-    lista_matrices.append(np.transpose(np.array(matriz_n)))
+    matrices_M_i.append(np.transpose(np.array(matriz_n)))
 
 #%%
 #-----------------------------------------------------------------------------
@@ -386,17 +476,20 @@ for n in range(0,10):
 # y devuelva en 3 listas la solucion de la descomposicion, es decir Ui, Σi y Vi.
 #-----------------------------------------------------------------------------
 
-def svd_Mi(lista_matrices):
+def svd_Mi(matrices_M_i):
     Ui = []
     Si = []
     Vi = []
-    for matriz in lista_matrices:
+    for i,matriz in enumerate(matrices_M_i):
         u_i,s_i,v_i = svd(matriz)     # cada matriz en la lista es un DF, lo pasamos a np.array
         Ui.append(u_i)
         Si.append(s_i)
         Vi.append(v_i)
+        print("Calculando sobre M_i, i=",i)
     return Ui,Si,Vi
 
+
+#Ui,Si,Vi = svd_Mi(matrices_M_i)
 #%%
 #-----------------------------------------------------------------------------
 # (c) Las columnas de Ui son combinacion lineal del espacio columna de Mi. Teniendo esto presente
@@ -406,59 +499,56 @@ def svd_Mi(lista_matrices):
 
 # la funcion graficara la primer columna de cada Ui para la SVD de las 10 matrices
 
-def graficar_u1(lista_matrices):
-    Ui,Si,Vi = svd_Mi(lista_matrices)
+def graficar_u1(Ui): #Solo que reciban Ui, que se calcula una sola vez en el scope global
     for digito,ui in enumerate(Ui):
-        plt.imshow(np.transpose(ui)[0].reshape((28,28)),cmap='gray')
-        plt.title(f'Columna u1 del {digito}')
-        plt.axis('off')
-        plt.subplots_adjust(top=0.90)
+        plt.imshow(np.transpose(ui)[0].reshape((28,28)),cmap='Greys')
+        plt.title(r'Columna $u_1$')
+        configuraciones_diseño()
+        plt.subplots_adjust(top=0.85)
         plt.suptitle(f"Digito: {digito}", fontsize=15)
         plt.show()
         
-#graficar_u1(lista_matrices)
+#graficar_u1(Ui)
 #%%
 #-----------------------------------------------------------------------------
 # (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
 # obtenido en (c) y explicar las diferencias.
 #-----------------------------------------------------------------------------
 
-def graficar_u2_u3(lista_matrices):
-    Ui,Si,Vi = svd_Mi(lista_matrices)
-    #i=0
+def graficar_u2_u3(Ui):
     for digito,ui in enumerate(Ui):
         plt.subplot(1,2,1)
-        plt.imshow(np.transpose(ui)[1].reshape((28,28)),cmap='gray')
-        plt.title('Columna u2')
-        plt.axis('off')
+        plt.imshow(np.transpose(ui)[1].reshape((28,28)),cmap='Greys')
+        plt.title(r'Columna $u_2$')
+        configuraciones_diseño()
         plt.subplot(1,2,2)
-        plt.imshow(np.transpose(ui)[2].reshape((28,28)),cmap='gray')
-        plt.title('Columna u3')
-        plt.axis('off')
-        plt.subplots_adjust(top=0.99,hspace=0.4)
+        plt.imshow(np.transpose(ui)[2].reshape((28,28)),cmap='Greys')
+        plt.title(r'Columna $u_3$')
+        configuraciones_diseño()
+        plt.subplots_adjust(top=0.85,hspace=0.4)
         plt.suptitle(f"Digito: {digito}", fontsize=15)
         plt.show()
-        #i+=1
 
-#graficar_u2_u3(lista_matrices)
+#graficar_u2_u3(Ui)
 #%%-----------------------------------------------------------------------------
 
-def comparar_promedio_svd(lista_matrices,imagenes_prom):
-    Ui,Si,Vi = svd_Mi(lista_matrices)
+def comparar_promedio_svd(Ui,imagenes_prom):
     for i in range(0,10):
         imagen_promedio = imagenes_prom[i][1:].reshape((28,28))
         imagen_u1 = np.transpose(Ui[i])[0].reshape((28,28))
         plt.subplot(1,2,1)
-        plt.imshow(imagen_promedio,cmap='gray')
+        plt.imshow(imagen_promedio,cmap='Greys')
         plt.title('imagen promedio')
-        plt.axis('off')
+        configuraciones_diseño()
         plt.subplot(1,2,2)
-        plt.imshow(imagen_u1,cmap='gray')
-        plt.title('imagen u1')
-        plt.axis('off')
+        plt.imshow(imagen_u1,cmap='Greys')
+        plt.title(r'imagen $u_1$')
+        configuraciones_diseño()
+        plt.subplots_adjust(top=0.95,hspace=0.4)
+        plt.suptitle(f"Digito: {i}", fontsize=15)
         plt.show()
-
-#comparar_promedio_svd(lista_matrices,imagenes_prom)
+        
+#comparar_promedio_svd(Ui,imagenes_prom)
 #%%
 #-----------------------------------------------------------------------------
 # (e)
@@ -492,6 +582,9 @@ def predecir(Ui,k,x):
     return digito_menor_residuo
 
 def prediccion_SVD(Ui,k,x):
+    """
+    Devuelve la prediccion dada la imagen de test x para un cierto valor k
+    """
     residuos = []
     for i in range(10):
         Uik = Ui[i][:,:k]
@@ -502,24 +595,27 @@ def prediccion_SVD(Ui,k,x):
 
 #%% Prueba unitaria
 #Ui,Si,Vi = svd_Mi(lista_matrices)
-idx_random = np.random.randint(0, len(test))
-x = np.array(test.iloc[idx_random,1:])
-x_label = test.iloc[idx_random,0]
+# idx_random = np.random.randint(0, len(test))
+# x = np.array(test.iloc[idx_random,1:])
+# x_label = test.iloc[idx_random,0]
 
-predicciones = []
-for k in range(1,6):
-    pred = prediccion_SVD(Ui,k,x)
-    predicciones.append(pred)
+# predicciones = []
+# for k in range(1,6):
+#     pred = prediccion_SVD(Ui,k,x)
+#     predicciones.append(pred)
 
-#Elegimos la prediccion con mas frecuencia a lo largo del valor k
-valores, conteos = np.unique(predicciones, return_counts=True)
-idx_max_frec = np.argmax(conteos)
-prediccion_img = valores[idx_max_frec]
+# #Elegimos la prediccion con mas frecuencia a lo largo del valor k
+# valores, conteos = np.unique(predicciones, return_counts=True)
+# idx_max_frec = np.argmax(conteos)
+# prediccion_img = valores[idx_max_frec]
 
 #graficar(test,idx_random,str(prediccion_img))
 #%%
 
 def prediccion_n_imgs(df_test,Ui,n,k):
+    """
+    Predice las primeras n imagenes en df_test para un cierto valor k
+    """
     df = df_test.iloc[:n,test.columns[1:]].values
     predicciones = []
     for i in range(n):
@@ -530,7 +626,7 @@ def prediccion_n_imgs(df_test,Ui,n,k):
 
 def precision_SVD(df_test,Ui,n,k):
     """
-    Devuelve una lista con las precisiones para cada valor de 1 a k
+    Devuelve una lista con las precisiones para cada valor de 1 a k de las primeras n imagenes en df_test 
     """
     preds_k = []
     for i in range(1,k+1):
@@ -538,25 +634,41 @@ def precision_SVD(df_test,Ui,n,k):
         y_test = df_test.iloc[:n,0].values #.values para pasar a array numpy
         aciertos = sum(predicciones == y_test)
         preds_k.append(aciertos/n)
-        print(f"precision para k={i}:{aciertos/n:.2f} para {n} imagenes de test")
+        print(f"Precision para k={i}: {aciertos/n:.3f} para {n} imagenes de test")
     return preds_k
 #%%
 
 def graf_precisiones(df_test,Ui,n,k):
     precisiones = precision_SVD(df_test,Ui,n,k)
     x = range(1,k+1)
-    plt.plot(x, precisiones,marker="o",drawstyle="steps-post")
+    plt.plot(x, precisiones,marker="o",drawstyle="steps-post",label="Ej.4")
     min_precision = np.min(precisiones)
     plt.ylim(min_precision-0.02, 1) #Limites para el eje y
     plt.xticks(x, [int(val) for val in x]) #valores enteros en eje x
     plt.title('Precision según k')
     plt.xlabel('Valores de k')
     plt.ylabel('Precision')
+    plt.grid(True)
+    plt.legend()
     plt.show()
-    
 
 k = 5
 n = 200 #n imagenes de test
 df_test = test
 #graf_precisiones(df_test,Ui,n,k)
 
+#%%
+# =============================================================================
+# EJERCICIO 5
+# =============================================================================
+#Finalmente comparar los resultados obtenidos para la precisi´on entre los ejercicios 2 y 4. ¿Qu´e puede
+#observar? Graficar y comentar aquellos casos en los cuales la predicci´on fall´o en el ejercicio 4 para
+#distintos k. Por ejemplo, alg´un caso en el que la predicci´on haya fallado con alg´un k y luego con otro
+#k haya sido exitosa.
+
+#Precision del ej.2:
+pred_con_prom = precision(test,imagenes_prom)
+print("Precision en ej.2: ", pred_con_prom)
+#Precision del ej.4:
+plt.axhline(y=pred_con_prom, color='red', linestyle='--', label='Ej.2')
+graf_precisiones(test,Ui,n,k)

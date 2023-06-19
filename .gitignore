@@ -1,3 +1,4 @@
 *.csv
 *.csv#
 *.swp
+**/.ipynb_checkpoints
