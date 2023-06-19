@@ -234,7 +234,7 @@ def imgs_no_acertadas(df_test,imagenes_p):
     res = res.reset_index(drop=True) #reseteo los indices, pues ya no son continuos
     return res
 
-def graficar_alguna_img_yeta():
+def graficar_alguna_img_sin_acertar():
     imgs = imgs_no_acertadas(test,imagenes_prom)
     cant_imgs = len(imgs)
     i = np.random.randint(0, cant_imgs)
@@ -273,7 +273,7 @@ def graficar_num_no_acertado():
 
     graficar(test,indices_imagenes_no_acertadas[r]) 
 
-#graficar_alguna_img_yeta()
+#graficar_alguna_img_sin_acertar()
 #%%
 
 #==============================================================================
@@ -491,7 +491,7 @@ def predecir(Ui,k,x):
             digito_menor_residuo = i
     return digito_menor_residuo
 
-def predecirAlt(Ui,k,x):
+def prediccion_SVD(Ui,k,x):
     residuos = []
     for i in range(10):
         Uik = Ui[i][:,:k]
@@ -508,10 +508,10 @@ x_label = test.iloc[idx_random,0]
 
 predicciones = []
 for k in range(1,6):
-    pred = predecirAlt(Ui,k,x)
+    pred = prediccion_SVD(Ui,k,x)
     predicciones.append(pred)
 
-#Elegimos la prediccion con mas frecuencia
+#Elegimos la prediccion con mas frecuencia a lo largo del valor k
 valores, conteos = np.unique(predicciones, return_counts=True)
 idx_max_frec = np.argmax(conteos)
 prediccion_img = valores[idx_max_frec]
@@ -519,12 +519,44 @@ prediccion_img = valores[idx_max_frec]
 graficar(test,idx_random,str(prediccion_img))
 #%%
 
+def prediccion_n_imgs(df_test,Ui,n,k):
+    df = df_test.iloc[:n,test.columns[1:]].values
+    predicciones = []
+    for i in range(n):
+        x = df[i]
+        pred = prediccion_SVD(Ui,k,x)
+        predicciones.append(pred)
+    return predicciones
 
+def precision_SVD(df_test,Ui,n,k):
+    """
+    Devuelve una lista con las precisiones para cada valor de 1 a k
+    """
+    preds_k = []
+    for i in range(1,k+1):
+        predicciones = prediccion_n_imgs(df_test,Ui,n,i)
+        y_test = df_test.iloc[:n,0].values #.values para pasar a array numpy
+        aciertos = sum(predicciones == y_test)
+        preds_k.append(aciertos/n)
+        print(f"precision para k={i}:{aciertos/n:.2f} para {n} imagenes de test")
+    return preds_k
+#%%
 
+def graf_precisiones(df_test,Ui,n,k):
+    precisiones = precision_SVD(df_test,Ui,n,k)
+    x = range(1,k+1)
+    plt.plot(x, precisiones,marker="o",drawstyle="steps-post")
+    min_precision = np.min(precisiones)
+    plt.ylim(min_precision-0.02, 1) #Limites para el eje y
+    plt.xticks(x, [int(val) for val in x]) #valores enteros en eje x
+    plt.title('Precision según k')
+    plt.xlabel('Valores de k')
+    plt.ylabel('Precision')
+    plt.show()
+    
 
-
-
-
-
-
+k = 5
+n = 200 #n imagenes de test
+df_test = test
+graf_precisiones(df_test,Ui,n,k)
 
