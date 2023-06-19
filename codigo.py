@@ -22,10 +22,13 @@ test = pd.read_csv('mnist_test.csv',names=np.linspace(0,784,785))
 # indique a que numero corresponde, es decir su clasificacion. Usar la funcion imshow() de pyplot.
 #-----------------------------------------------------------------------------
 
-def graficar(df,fila):
+def graficar(df,fila,pred = None):
     plt.imshow(np.array(df.iloc[fila,1:]).reshape(28,28),cmap='gray')
     numero = df.iloc[fila,0]
     plt.title(f'Numero: {numero}')
+    if pred :
+        plt.figtext(0.5, 0.01, f'prediccion: {pred}', ha='center', fontsize=10)
+    plt.axis('off')
     plt.show()
 
 #prueNumero: ',test.iloc[indices_imagenes_no_acertadas[r],0]ba:
@@ -342,11 +345,13 @@ def svd(A):
         A = A - np.dot((s_i*u_i).reshape(len(u_i),1),v_i.reshape(1,len(v_i)))
     
     U = np.transpose(U)
+    S = np.array(S)
+    V = np.array(V)
 
-    return U,np.array(S),np.array(V)
+    return U,S,V
         
 
-
+#%%
 #==============================================================================
 # EJERCICIO 4
 #==============================================================================
@@ -355,7 +360,7 @@ def svd(A):
 # numeros manuscritos.
 
 #-----------------------------------------------------------------------------
-# (a) Tomar las primeras 2.000 imagenes del conjunto de imagenes de testeo y ordenarlas segun el
+# (a) Tomar las primeras 2.000 imagenes del conjunto de imagenes de entrenamiento y ordenarlas segun el
 # dıgito al que corresponde de 0 a 9. Obtener 10 matrices correspondientes a cada dıgito. Estas
 # matrices deben tener una dimension de 785 × cantidad imagenes, puede no haber la misma
 # cantidad de imagenes para cada dıgito en las primeras 2.000 imagenes. Recordar que la primer
@@ -365,15 +370,16 @@ def svd(A):
 # que representan.
 #-----------------------------------------------------------------------------
 
-test_2000 = test.iloc[:2000,:]
+train_2000 = train.iloc[:2000,:]
 
 lista_matrices = []
+
 for n in range(0,10):
     #obtengo matrices para cada numero
-    matriz_n = test_2000[test_2000[0] == n].iloc[:,1:]  # se le saca la primer columna
+    matriz_n = train_2000[train_2000[0] == n].iloc[:,1:]  # se le saca la primer columna
     lista_matrices.append(np.transpose(np.array(matriz_n)))
 
-
+#%%
 #-----------------------------------------------------------------------------
 # (b) Realizar la descomposicion SVD de cada una de las matrices Mi utilizando la funcion creada
 # en el ejercicio (3). Para ello realizar una funcion en Python que tome la lista de matrices Mi
@@ -391,7 +397,7 @@ def svd_Mi(lista_matrices):
         Vi.append(v_i)
     return Ui,Si,Vi
 
-
+#%%
 #-----------------------------------------------------------------------------
 # (c) Las columnas de Ui son combinacion lineal del espacio columna de Mi. Teniendo esto presente
 # tomar la primer columna de cada Ui y graficarla como imagen, es decir convertir a una matriz
@@ -402,13 +408,16 @@ def svd_Mi(lista_matrices):
 
 def graficar_u1(lista_matrices):
     Ui,Si,Vi = svd_Mi(lista_matrices)
-    i=0
-    for ui in Ui:
+    for digito,ui in enumerate(Ui):
         plt.imshow(np.transpose(ui)[0].reshape((28,28)),cmap='gray')
-        plt.title('Grafico con columna u1 del '+str(i))
+        plt.title(f'Columna u1 del {digito}')
+        plt.axis('off')
+        plt.subplots_adjust(top=0.90)
+        plt.suptitle(f"Digito: {digito}", fontsize=15)
         plt.show()
-        i+=1
-
+        
+graficar_u1(lista_matrices)
+#%%
 #-----------------------------------------------------------------------------
 # (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
 # obtenido en (c) y explicar las diferencias.
@@ -416,19 +425,23 @@ def graficar_u1(lista_matrices):
 
 def graficar_u2_u3(lista_matrices):
     Ui,Si,Vi = svd_Mi(lista_matrices)
-    i=0
-    for ui in Ui:
+    #i=0
+    for digito,ui in enumerate(Ui):
         plt.subplot(1,2,1)
         plt.imshow(np.transpose(ui)[1].reshape((28,28)),cmap='gray')
-        plt.title('Grafico con columna u2 del '+str(i))
+        plt.title('Columna u2')
+        plt.axis('off')
         plt.subplot(1,2,2)
         plt.imshow(np.transpose(ui)[2].reshape((28,28)),cmap='gray')
-        plt.title('Grafico con columna u3 del '+str(i))
+        plt.title('Columna u3')
+        plt.axis('off')
+        plt.subplots_adjust(top=0.99,hspace=0.4)
+        plt.suptitle(f"Digito: {digito}", fontsize=15)
         plt.show()
-        i+=1
+        #i+=1
 
-
-#-----------------------------------------------------------------------------
+graficar_u2_u3(lista_matrices)
+#%%-----------------------------------------------------------------------------
 
 def comparar_promedio_svd(lista_matrices,imagenes_prom):
     Ui,Si,Vi = svd_Mi(lista_matrices)
@@ -438,12 +451,15 @@ def comparar_promedio_svd(lista_matrices,imagenes_prom):
         plt.subplot(1,2,1)
         plt.imshow(imagen_promedio,cmap='gray')
         plt.title('imagen promedio')
+        plt.axis('off')
         plt.subplot(1,2,2)
         plt.imshow(imagen_u1,cmap='gray')
         plt.title('imagen u1')
+        plt.axis('off')
         plt.show()
 
-
+comparar_promedio_svd(lista_matrices,imagenes_prom)
+#%%
 #-----------------------------------------------------------------------------
 # (e)
 #• Sea ˆUi,k ∈ R784×k la matriz que resulta de tomar las primeras k columnas de Ui (hacerlo
@@ -457,7 +473,7 @@ def comparar_promedio_svd(lista_matrices,imagenes_prom):
 #• Guardar el ˆi cuyo residuo es el menor, es decir, ˆi = min{i : ∥ri,k(x)∥}, para i = 0, . . . , 9.
 #´Esta es la predicci´on para la imagen x, en la aproximaci´on de rango k.
 #• Comparar con el d´ıgito esperado.
-#-----------------------------------------------------------------------------
+#%%-----------------------------------------------------------------------------
 
 # toma la lista de Ui, luego calcula el i cuyo residuo es menor
 # k es la cantidad de columnas a utilizar de cada Ui
@@ -475,13 +491,35 @@ def predecir(Ui,k,x):
             digito_menor_residuo = i
     return digito_menor_residuo
 
+def predecirAlt(Ui,k,x):
+    residuos = []
+    for i in range(10):
+        Uik = Ui[i][:,:k]
+        residuo_i = np.linalg.norm(x-(np.dot(Uik,np.dot(np.transpose(Uik),x))))
+        residuos.append(residuo_i)
+    digito_menor_residuo = np.argmin(residuos)
+    return digito_menor_residuo
+
+#%% Prueba unitaria
+Ui,Si,Vi = svd_Mi(lista_matrices)
+idx_random = np.random.randint(0, len(test))
+x = np.array(test.iloc[idx_random,1:])
+x_label = test.iloc[idx_random,0]
+
+predicciones = []
+for k in range(1,6):
+    pred = predecirAlt(Ui,k,x)
+    predicciones.append(pred)
+
+#Elegimos la prediccion con mas frecuencia
+valores, conteos = np.unique(predicciones, return_counts=True)
+idx_max_frec = np.argmax(conteos)
+prediccion_img = valores[idx_max_frec]
+
+graficar(test,idx_random,str(prediccion_img))
+#%%
 
 
-
-
-
-
-        
 
 
 
