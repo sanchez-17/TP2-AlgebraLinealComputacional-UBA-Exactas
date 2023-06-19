@@ -416,7 +416,7 @@ def graficar_u1(lista_matrices):
         plt.suptitle(f"Digito: {digito}", fontsize=15)
         plt.show()
         
-graficar_u1(lista_matrices)
+#graficar_u1(lista_matrices)
 #%%
 #-----------------------------------------------------------------------------
 # (d) Repetir el ıtem anterior pero para las columnas 2 y 3 de cada una de las Ui. Comparar con lo
@@ -440,7 +440,7 @@ def graficar_u2_u3(lista_matrices):
         plt.show()
         #i+=1
 
-graficar_u2_u3(lista_matrices)
+#graficar_u2_u3(lista_matrices)
 #%%-----------------------------------------------------------------------------
 
 def comparar_promedio_svd(lista_matrices,imagenes_prom):
@@ -458,7 +458,7 @@ def comparar_promedio_svd(lista_matrices,imagenes_prom):
         plt.axis('off')
         plt.show()
 
-comparar_promedio_svd(lista_matrices,imagenes_prom)
+#comparar_promedio_svd(lista_matrices,imagenes_prom)
 #%%
 #-----------------------------------------------------------------------------
 # (e)
@@ -501,7 +501,7 @@ def prediccion_SVD(Ui,k,x):
     return digito_menor_residuo
 
 #%% Prueba unitaria
-Ui,Si,Vi = svd_Mi(lista_matrices)
+#Ui,Si,Vi = svd_Mi(lista_matrices)
 idx_random = np.random.randint(0, len(test))
 x = np.array(test.iloc[idx_random,1:])
 x_label = test.iloc[idx_random,0]
@@ -516,7 +516,7 @@ valores, conteos = np.unique(predicciones, return_counts=True)
 idx_max_frec = np.argmax(conteos)
 prediccion_img = valores[idx_max_frec]
 
-graficar(test,idx_random,str(prediccion_img))
+#graficar(test,idx_random,str(prediccion_img))
 #%%
 
 def prediccion_n_imgs(df_test,Ui,n,k):
@@ -558,5 +558,5 @@ def graf_precisiones(df_test,Ui,n,k):
 k = 5
 n = 200 #n imagenes de test
 df_test = test
-graf_precisiones(df_test,Ui,n,k)
+#graf_precisiones(df_test,Ui,n,k)
 
