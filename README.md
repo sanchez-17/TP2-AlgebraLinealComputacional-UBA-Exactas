@@ -12,3 +12,16 @@ El objetivo de este trabajo práctico es aplicar el método de descomposición d
 Se utilizará el conjunto de datos MNIST para trabajar con imágenes de entrenamiento y prueba. Se cuenta con un archivo CSV llamado mnist_train.csv, que contiene 60.000 imágenes de entrenamiento con sus etiquetas de clasificación, y otro archivo CSV llamado mnist_test.csv con 10.000 imágenes de prueba. Estas imágenes están en escala de grises y tienen una dimensión de 28x28 píxeles.
 
 Nota: El trabajo práctico está implementado en un Jupyter Notebook llamado "tp2.ipynb", estructurado segun el enunciado propuesto.
+
+Para descomprimir los datos de entrenamiento(desarrollo)
+
+```
+gunzip -c ./mnist_train.csv.gz > ./mnist_train.csv
+```
+
+Luego los datos de test
+```
+gunzip -c ./mnist_test.csv.gz > ./mnist_test.csv
+```
+
+
